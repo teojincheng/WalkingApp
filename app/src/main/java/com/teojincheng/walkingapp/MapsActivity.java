@@ -1,12 +1,17 @@
 package com.teojincheng.walkingapp;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -17,27 +22,48 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
+
+    private String TAG = "walkingApp";
 
     private GoogleMap mMap;
 
     private CameraPosition mCameraPosition;
 
+    private LocationListener locListener;
+
 
     private GoogleApiClient mGoogleApiClient;
 
+    private LocationManager locationManager;
+
     private Location mLastKnownLocation;
-    private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
+    private final LatLng mDefaultLocation = new LatLng(1.283333, 103.833333);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
+
+    TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+
+
+
+
+
+
+
+        textView = (TextView) findViewById(R.id.textView);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -51,6 +77,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+
+
+
+
+
     }
 
 
@@ -58,14 +91,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        ArrayList<LatLng> list = new ArrayList<LatLng>();
+        list.add(new LatLng(1.300291,103.782156));
+        list.add(new LatLng(1.300378,103.782279));
+        list.add(new LatLng(1.300549,103.782603));
+
+        Polyline line = mMap.addPolyline(new PolylineOptions()
+                .addAll(list)
+                .width(5)
+                .color(Color.RED));
+
         updateLocationUI();
+
 
 
         getDeviceLocation();
 
 
        /*
-        LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         */
@@ -111,6 +154,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mLocationPermissionGranted) {
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
+
+
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+
+                    textView.setText("location really change");
+                }
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+                @Override
+                public void onStatusChanged(String provider, int status,
+                                            Bundle extras) {
+
+                }
+            });
+
+
         }
 
         // Set the map's camera position to the current location of the device.
@@ -171,5 +239,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
             mLastKnownLocation = null;
         }
+
+
     }
+
+
+
 }
