@@ -42,6 +42,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient mGoogleApiClient;
 
     private LocationManager locationManager;
+    ArrayList<LatLng> list = new ArrayList<LatLng>();
 
     private Location mLastKnownLocation;
     private final LatLng mDefaultLocation = new LatLng(1.283333, 103.833333);
@@ -91,6 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        /*
         ArrayList<LatLng> list = new ArrayList<LatLng>();
         list.add(new LatLng(1.300291,103.782156));
         list.add(new LatLng(1.300378,103.782279));
@@ -100,6 +102,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .addAll(list)
                 .width(5)
                 .color(Color.RED));
+
+                */
 
         updateLocationUI();
 
@@ -157,11 +161,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, new LocationListener() {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
 
                     textView.setText("location really change");
+                    list.add(new LatLng(location.getLatitude(),location.getLongitude()));
+
+                    Polyline line = mMap.addPolyline(new PolylineOptions()
+                            .addAll(list)
+                            .width(5)
+                            .color(Color.RED));
+
+                
                 }
                 @Override
                 public void onProviderDisabled(String provider) {
