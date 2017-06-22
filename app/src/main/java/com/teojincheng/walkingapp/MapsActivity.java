@@ -1,16 +1,21 @@
 package com.teojincheng.walkingapp;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,51 +34,45 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
     private String TAG = "walkingApp";
+    private String S_INTENT_KEY = "sKey";
+    private String START_WATCH = "start";
+    private String STOP_WACTH = "stop";
 
     private GoogleMap mMap;
-
     private CameraPosition mCameraPosition;
-
     private LocationListener locListener;
-
-
     private GoogleApiClient mGoogleApiClient;
-
     private LocationManager locationManager;
-    ArrayList<LatLng> list = new ArrayList<LatLng>();
-
     private Location mLastKnownLocation;
     private final LatLng mDefaultLocation = new LatLng(1.283333, 103.833333);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
-    boolean stopWatchRunning = false;
 
-    StopWatch stopWatch;
-
+    ArrayList<LatLng> list = new ArrayList<LatLng>();
     TextView textView;
     Button button;
     Button startButton;
     Button endButton;
+    StopWatchService stopWatchService;
+    boolean mBound = false;
+    Intent stopWatchIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        stopWatch = new StopWatch();
-
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.button2);
         startButton = (Button) findViewById(R.id.buttonStart);
         endButton = (Button) findViewById(R.id.buttonEnd);
+        stopWatchIntent = new Intent(this, StopWatchService.class);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -88,23 +87,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                stopWatch.start();
-                stopWatchRunning = true;
-
-
+                stopWatchIntent.putExtra(S_INTENT_KEY,START_WATCH);
+                startService(stopWatchIntent);
+                bindService(stopWatchIntent, mConnection, Context.BIND_AUTO_CREATE);
             }
         });
-
 
         endButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                stopWatch.stop();
 
 
             }
         });
+
 
         Thread t = new Thread() {
 
@@ -116,9 +114,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (stopWatchRunning) {
-                                    textView.setText(String.valueOf(stopWatch.getElapsedTime()));
-
+                                if(mBound) {
+                                    long elapsedTime = stopWatchService.getElapsedTime();
+                                    textView.setText(String.valueOf(elapsedTime));
                                 }
                             }
                         });
@@ -132,6 +130,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
+
+
+
+    protected void onDestroy(){
+        super.onDestroy();
+        if(mBound){
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className,
+                                       IBinder service) {
+            StopWatchService.LocalBinder binder = (StopWatchService.LocalBinder) service;
+            stopWatchService = binder.getService();
+            mBound = true;
+        }
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            mBound = false;
+        }
+    };
 
 
     @Override

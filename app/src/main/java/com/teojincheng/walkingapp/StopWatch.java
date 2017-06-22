@@ -3,7 +3,7 @@ package com.teojincheng.walkingapp;
 import java.util.concurrent.TimeUnit;
 
 /**
- * This class emulates a stopwatch. 
+ * This class emulates a stopwatch.
  */
 
 public class StopWatch {
