@@ -37,13 +37,8 @@ public class StopWatchService extends Service {
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-       if(intent != null){
-           String command = intent.getExtras().getString(S_INTENT_KEY);
-
-           if(command.equals(START_WATCH)){
                stopWatch.start();
-           }
-       }
+
 
         return START_STICKY;
     }
@@ -51,5 +46,19 @@ public class StopWatchService extends Service {
 
     public long getElapsedTime(){
         return stopWatch.getElapsedTime();
+    }
+
+
+    @Override
+    public boolean stopService(Intent name) {
+        stopWatch.stop();
+        return super.stopService(name);
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        stopWatch.stop();
     }
 }
