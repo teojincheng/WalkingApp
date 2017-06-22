@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -24,8 +26,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -49,22 +54,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
+    boolean stopWatchRunning = false;
+
+    StopWatch stopWatch;
 
     TextView textView;
+    Button button;
+    Button startButton;
+    Button endButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-
-
-
-
-
-
+        stopWatch = new StopWatch();
 
         textView = (TextView) findViewById(R.id.textView);
+        button = (Button) findViewById(R.id.button2);
+        startButton = (Button) findViewById(R.id.buttonStart);
+        endButton = (Button) findViewById(R.id.buttonEnd);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */,
@@ -79,10 +88,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        startButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                stopWatch.start();
+                stopWatchRunning = true;
 
 
+            }
+        });
 
 
+        endButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                stopWatch.stop();
+
+
+            }
+        });
+
+        Thread t = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (!isInterrupted()) {
+                        Thread.sleep(1000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (stopWatchRunning) {
+                                    textView.setText(String.valueOf(stopWatch.getElapsedTime()));
+
+                                }
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        t.start();
 
 
     }
@@ -92,30 +138,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        /*
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
-        list.add(new LatLng(1.300291,103.782156));
-        list.add(new LatLng(1.300378,103.782279));
-        list.add(new LatLng(1.300549,103.782603));
-
-        Polyline line = mMap.addPolyline(new PolylineOptions()
-                .addAll(list)
-                .width(5)
-                .color(Color.RED));
-
-                */
-
         updateLocationUI();
-
-
 
         getDeviceLocation();
 
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                double computedDistance = getDistance();
+                textView.setText(String.valueOf(computedDistance));
 
-       /*
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        */
+
+            }
+
+        });
+
     }
 
 
@@ -142,6 +178,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * device. The result of the permission request is handled by a callback,
          * onRequestPermissionsResult.
          */
+
+
         if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -161,28 +199,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, new LocationListener() {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-
-                    textView.setText("location really change");
-                    list.add(new LatLng(location.getLatitude(),location.getLongitude()));
+                    list.add(new LatLng(location.getLatitude(), location.getLongitude()));
 
                     Polyline line = mMap.addPolyline(new PolylineOptions()
                             .addAll(list)
                             .width(5)
                             .color(Color.RED));
 
-                
+
                 }
+
                 @Override
                 public void onProviderDisabled(String provider) {
 
                 }
+
                 @Override
                 public void onProviderEnabled(String provider) {
 
                 }
+
                 @Override
                 public void onStatusChanged(String provider, int status,
                                             Bundle extras) {
@@ -255,6 +294,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    private double getDistance() {
+
+        double totalDistance = 0;
+
+        for (int i = 0; i < list.size() - 1; i++) {
+            totalDistance = totalDistance + SphericalUtil.computeDistanceBetween(list.get(i), list.get(i + 1));
+        }
+
+        return totalDistance;
+
+    }
 
 
 }
