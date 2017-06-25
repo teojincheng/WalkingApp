@@ -36,10 +36,24 @@ public class MainActivity extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
        // DatabaseReference myRef = database.getReference("message");
-        DatabaseReference rt = database.getReference("rt");
+        DatabaseReference rt = database.getReference("user1");
+
+        rt.child("distance").setValue(20);
+        rt.child("locs").setValue(al);
+
        // rt.setValue("one");
 
-       // DatabaseReference child = rt.push();
+        /*
+        DatabaseReference child = database.getReference("distance");
+        child = rt.push();
+
+        DatabaseReference aChild = database.getReference("arr");
+        aChild= rt.push();
+
+        child.setValue(20);
+        aChild.setValue(al);
+*/
+
        // child.setValue("oneobe");
 
         //DatabaseReference aChild = rt.push();
@@ -47,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
       //  myRef.setValue(al);
 
       // myRef.setValue("wow");
-
+/*
      rt.addValueEventListener(new ValueEventListener() {
          @Override
          public void onDataChange(DataSnapshot dataSnapshot) {
@@ -64,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
          }
      });
 
-
+*/
         /*
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
