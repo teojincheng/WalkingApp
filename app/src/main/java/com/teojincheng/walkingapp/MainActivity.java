@@ -39,16 +39,32 @@ public class MainActivity extends AppCompatActivity {
         DatabaseReference rt = database.getReference("rt");
        // rt.setValue("one");
 
-        DatabaseReference child = rt.push();
-        child.setValue("oneobe");
+       // DatabaseReference child = rt.push();
+       // child.setValue("oneobe");
 
-        DatabaseReference aChild = rt.push();
-        aChild.setValue("tweowto");
+        //DatabaseReference aChild = rt.push();
+        //aChild.setValue("tweowto");
       //  myRef.setValue(al);
 
       // myRef.setValue("wow");
 
-        // Read from the database
+     rt.addValueEventListener(new ValueEventListener() {
+         @Override
+         public void onDataChange(DataSnapshot dataSnapshot) {
+             for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                 String value = postSnapshot.getValue(String.class);
+                 Log.i(TAG,value);
+             }
+
+             }
+
+         @Override
+         public void onCancelled(DatabaseError databaseError) {
+
+         }
+     });
+
+
         /*
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
