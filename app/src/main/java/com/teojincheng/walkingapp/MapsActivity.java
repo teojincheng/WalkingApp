@@ -35,6 +35,13 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
@@ -65,6 +72,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean mBound = false;
     Intent startWatchIntent;
     Intent stopWatchIntent;
+    GenericTypeIndicator<ArrayList<Integer>> t;
+    DatabaseReference exampleRun;
 
 
     @Override
@@ -78,6 +87,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         endButton = (Button) findViewById(R.id.buttonEnd);
         startWatchIntent = new Intent(this, StopWatchService.class);
         stopWatchIntent = new Intent(this, StopWatchService.class);
+        t = new GenericTypeIndicator<ArrayList<Integer>>() {
+        };
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        DatabaseReference rt = database.getReference("user1");
+
+
+        exampleRun = rt.push();
+
+        /*
+        exampleRun.child("distance").setValue(20);
+        exampleRun.child("locs").setValue(al);
+*/
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -105,12 +128,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         endButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-               stopService(stopWatchIntent);
+                double computedDistance = getDistance();
+                textView.setText(String.valueOf(computedDistance));
+
+                exampleRun.child("distance").setValue(computedDistance);
+                exampleRun.child("arrOfLatLng").setValue(list);
+                stopService(stopWatchIntent);
                 unbindService(mConnection);
                 mBound = false;
-
-
-
 
 
             }
@@ -127,7 +152,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if(mBound) {
+                                if (mBound) {
                                     long elapsedTime = stopWatchService.getElapsedTime();
                                     String formattedTime = DateUtils.formatElapsedTime(elapsedTime);
                                     textView.setText(formattedTime);
@@ -146,11 +171,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
-
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
-        if(mBound){
+        if (mBound) {
             unbindService(mConnection);
             mBound = false;
         }
@@ -164,6 +187,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             stopWatchService = binder.getService();
             mBound = true;
         }
+
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             mBound = false;
@@ -181,8 +205,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                double computedDistance = getDistance();
-                textView.setText(String.valueOf(computedDistance));
 
 
             }

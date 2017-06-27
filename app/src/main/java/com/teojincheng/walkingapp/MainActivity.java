@@ -25,9 +25,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-     t = new GenericTypeIndicator<ArrayList<Integer>>() {};
-  rl = new ArrayList<Integer>();
+/*
+        t = new GenericTypeIndicator<ArrayList<Integer>>() {};
+        rl = new ArrayList<Integer>();
 
         ArrayList<Integer> al = new ArrayList<Integer>();
         al.add(33);
@@ -35,33 +35,17 @@ public class MainActivity extends AppCompatActivity {
         al.add(5);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-       // DatabaseReference myRef = database.getReference("message");
+
         DatabaseReference rt = database.getReference("user1");
 
-        rt.child("distance").setValue(20);
-        rt.child("locs").setValue(al);
 
-       // rt.setValue("one");
+        DatabaseReference exampleRun = rt.push();
 
-        /*
-        DatabaseReference child = database.getReference("distance");
-        child = rt.push();
+        exampleRun.child("distance").setValue(20);
+        exampleRun.child("locs").setValue(al);
 
-        DatabaseReference aChild = database.getReference("arr");
-        aChild= rt.push();
 
-        child.setValue(20);
-        aChild.setValue(al);
-*/
 
-       // child.setValue("oneobe");
-
-        //DatabaseReference aChild = rt.push();
-        //aChild.setValue("tweowto");
-      //  myRef.setValue(al);
-
-      // myRef.setValue("wow");
-/*
      rt.addValueEventListener(new ValueEventListener() {
          @Override
          public void onDataChange(DataSnapshot dataSnapshot) {
@@ -78,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
          }
      });
 
-*/
-        /*
+
+/*
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
