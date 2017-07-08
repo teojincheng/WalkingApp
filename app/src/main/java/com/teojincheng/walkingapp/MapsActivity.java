@@ -1,5 +1,13 @@
 package com.teojincheng.walkingapp;
 
+/**
+ * Created by Jin Cheng
+ *
+ * Creates a google map on the screen,
+ * show the location of the deivce on the screen
+ * show the route that the user has been walking on the map.
+ */
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -50,10 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.OnConnectionFailedListener {
 
     private String TAG = "walkingApp";
-    private String S_INTENT_KEY = "sKey";
-    private String START_WATCH = "start";
-    private String STOP_WACTH = "stop";
 
+    // variable for Google Map API
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
     private LocationListener locListener;
@@ -64,8 +70,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean mLocationPermissionGranted;
-
     ArrayList<LatLng> list = new ArrayList<LatLng>();
+
+
     TextView textView;
     Button button;
     Button startButton;
@@ -84,31 +91,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
         setTitle(getString(R.string.currentWalk));
 
+        //create the view elements
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.button2);
         startButton = (Button) findViewById(R.id.buttonStart);
         endButton = (Button) findViewById(R.id.buttonEnd);
+
         startWatchIntent = new Intent(this, StopWatchService.class);
         stopWatchIntent = new Intent(this, StopWatchService.class);
         c = Calendar.getInstance();
 
 
+        //add a child node to the db reference
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-
         DatabaseReference rt = database.getReference("user1");
-
-
-
         exampleRun = rt.push();
-
-
-        /*
-        exampleRun.child("distance").setValue(20);
-        exampleRun.child("locs").setValue(al);
-*/
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -119,7 +118,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .build();
         mGoogleApiClient.connect();
 
-
+        // creates the map leading to the onMapReady function being called
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -130,8 +129,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startService(startWatchIntent);
-
                 bindService(startWatchIntent, mConnection, Context.BIND_AUTO_CREATE);
+
+                // when the walk has started, take note of the current time.
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
                 formattedDate = df.format(c.getTime());
 
@@ -144,10 +144,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 textView.setText(String.valueOf(computedDistance));
                 long elapsedTime = stopWatchService.getElapsedTime();
 
+                //on the new child node, create these 4 'fields' and insert into the database
                 exampleRun.child("time").setValue(formattedDate);
                 exampleRun.child("distance").setValue(computedDistance);
                 exampleRun.child("arrOfLatLng").setValue(list);
                 exampleRun.child("duration").setValue(elapsedTime);
+
                 stopService(stopWatchIntent);
                 unbindService(mConnection);
                 mBound = false;
@@ -156,7 +158,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-
+        /**
+         * Every one second: display the time that has passed since the walk has started.
+         */
         Thread t = new Thread() {
 
             @Override
@@ -273,8 +277,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            //minimum time interval between location updates, in milliseconds. in here, is every 10 seconds.
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, new LocationListener() {
                 @Override
+                /**
+                 * Every time the current location of the device change,
+                 * add the latlng of the current location into an arrayList
+                 *
+                 * Display the 'locations' /coordinate the user has walked.
+                 */
                 public void onLocationChanged(Location location) {
                     list.add(new LatLng(location.getLatitude(), location.getLongitude()));
 
@@ -369,8 +380,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
+     *Loop through the arrayList of latlng
+     * and compute the distance between each latlng
      *
-     * @return distance in meters
+     * @return  total distance covered in meters
      */
     private double getDistance() {
 

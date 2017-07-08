@@ -1,7 +1,9 @@
 package com.teojincheng.walkingapp;
 
 /**
- * Created by User on 8/7/2017.
+ * Created by Jin Cheng
+ *
+ * This class is constructed to retrieve the latlng stored in the firebase database.
  */
 
 public class MLatLng {

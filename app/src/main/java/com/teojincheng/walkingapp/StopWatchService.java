@@ -14,9 +14,6 @@ import android.util.Log;
 public class StopWatchService extends Service {
 
     private String TAG = "walkingApp";
-    private String S_INTENT_KEY = "sKey";
-    private String START_WATCH = "start";
-    private String STOP_WACTH = "stop";
     StopWatch stopWatch = new StopWatch();
 
     public StopWatchService() {
