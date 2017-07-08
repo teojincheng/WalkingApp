@@ -21,7 +21,12 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps">
+
+
+
+
+        </activity>
 
         <service
             android:name=".StopWatchService"
@@ -34,8 +39,15 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
-        <activity android:name=".IndividualWalkActivity"></activity>
+        <activity android:name=".IndividualWalkActivity">
+
+
+
+
+
+        </activity>
     </application>
 
 </manifest>
