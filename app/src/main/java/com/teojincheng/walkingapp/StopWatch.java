@@ -22,6 +22,11 @@ public class StopWatch {
         this.running = false;
     }
 
+    /**
+     * Determine the time that has passed since the watch has started
+     *
+     * @return number of seconds passed
+     */
     public long getElapsedTime() {
         long elapsedTime = 0;
         if (running) {

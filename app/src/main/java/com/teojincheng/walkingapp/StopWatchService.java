@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
- *Service that runs the stopwatch
+ * Service that runs the stopwatch
  */
 
 public class StopWatchService extends Service {
@@ -19,12 +19,12 @@ public class StopWatchService extends Service {
     private String STOP_WACTH = "stop";
     StopWatch stopWatch = new StopWatch();
 
-    public StopWatchService(){
+    public StopWatchService() {
 
     }
 
     public class LocalBinder extends Binder {
-        StopWatchService getService(){
+        StopWatchService getService() {
             return StopWatchService.this;
         }
     }
@@ -36,15 +36,18 @@ public class StopWatchService extends Service {
         return mBinder;
     }
 
+    /*
+    When the service is started, start stopwatch.
+     */
     public int onStartCommand(Intent intent, int flags, int startId) {
-               stopWatch.start();
+        stopWatch.start();
 
 
         return START_STICKY;
     }
 
-
-    public long getElapsedTime(){
+    /* return how much time has passed in seconds */
+    public long getElapsedTime() {
         return stopWatch.getElapsedTime();
     }
 

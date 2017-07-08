@@ -42,7 +42,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -74,6 +76,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Intent stopWatchIntent;
     GenericTypeIndicator<ArrayList<Integer>> t;
     DatabaseReference exampleRun;
+    Calendar c;
+    String formattedDate = "";
 
 
     @Override
@@ -87,6 +91,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         endButton = (Button) findViewById(R.id.buttonEnd);
         startWatchIntent = new Intent(this, StopWatchService.class);
         stopWatchIntent = new Intent(this, StopWatchService.class);
+        c = Calendar.getInstance();
         t = new GenericTypeIndicator<ArrayList<Integer>>() {
         };
 
@@ -95,7 +100,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         DatabaseReference rt = database.getReference("user1");
 
 
+
         exampleRun = rt.push();
+
 
         /*
         exampleRun.child("distance").setValue(20);
@@ -116,12 +123,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+         /* when the start button is pressed, start the stopwatch service
+          * and bind to that service.
+           * */
         startButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startService(startWatchIntent);
 
                 bindService(startWatchIntent, mConnection, Context.BIND_AUTO_CREATE);
+                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyy HH:mm");
+                formattedDate = df.format(c.getTime());
 
             }
         });
@@ -130,9 +141,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 double computedDistance = getDistance();
                 textView.setText(String.valueOf(computedDistance));
+                long elapsedTime = stopWatchService.getElapsedTime();
 
+                exampleRun.child("time").setValue(formattedDate);
                 exampleRun.child("distance").setValue(computedDistance);
                 exampleRun.child("arrOfLatLng").setValue(list);
+                exampleRun.child("duration").setValue(elapsedTime);
                 stopService(stopWatchIntent);
                 unbindService(mConnection);
                 mBound = false;
@@ -353,6 +367,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    /**
+     *
+     * @return
+     */
     private double getDistance() {
 
         double totalDistance = 0;
