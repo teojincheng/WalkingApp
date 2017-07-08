@@ -8,4 +8,5 @@
 /captures
 app/src/debug/res/values/
 app/src/release/res/values/
+app/src/main/java/com/teojincheng/walkingapp/IndividualWalkActivity.java
 .externalNativeBuild

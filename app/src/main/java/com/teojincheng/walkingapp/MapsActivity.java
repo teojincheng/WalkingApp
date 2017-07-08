@@ -74,7 +74,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     boolean mBound = false;
     Intent startWatchIntent;
     Intent stopWatchIntent;
-    GenericTypeIndicator<ArrayList<Integer>> t;
+
     DatabaseReference exampleRun;
     Calendar c;
     String formattedDate = "";
@@ -94,8 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startWatchIntent = new Intent(this, StopWatchService.class);
         stopWatchIntent = new Intent(this, StopWatchService.class);
         c = Calendar.getInstance();
-        t = new GenericTypeIndicator<ArrayList<Integer>>() {
-        };
+
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
 
@@ -371,7 +370,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     /**
      *
-     * @return
+     * @return distance in meters
      */
     private double getDistance() {
 
