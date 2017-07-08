@@ -85,6 +85,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        setTitle(getString(R.string.currentWalk));
+
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.button2);
         startButton = (Button) findViewById(R.id.buttonStart);
@@ -131,7 +133,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startService(startWatchIntent);
 
                 bindService(startWatchIntent, mConnection, Context.BIND_AUTO_CREATE);
-                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyy HH:mm");
+                SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
                 formattedDate = df.format(c.getTime());
 
             }

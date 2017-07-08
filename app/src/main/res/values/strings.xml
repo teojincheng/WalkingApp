@@ -3,4 +3,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="currentWalk">Current Walk</string>
+    <string name="listOfWalks">List of Walks</string>
 </resources>

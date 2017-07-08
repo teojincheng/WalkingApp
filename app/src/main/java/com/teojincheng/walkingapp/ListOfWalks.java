@@ -1,8 +1,11 @@
 package com.teojincheng.walkingapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -24,11 +27,15 @@ public class ListOfWalks extends AppCompatActivity {
     ListView listview;
     ArrayList<String> list = new ArrayList<>();
     private String TAG = "walkingApp";
+    Intent intent;
+    private String INTENT_DATETIMEKEY = "dateTime";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_walks);
+
+        setTitle(R.string.listOfWalks);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference rt = database.getReference("user1");
@@ -36,12 +43,13 @@ public class ListOfWalks extends AppCompatActivity {
         listview = (ListView) findViewById(R.id.listview);
         final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, list);
         listview.setAdapter(adapter);
+        intent = new Intent(this, IndividualWalkActivity.class);
 
 
         rt.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
 
                     String dateTime = (String) postSnapshot.child("time").getValue();
                     list.add(dateTime);
@@ -53,6 +61,22 @@ public class ListOfWalks extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+
+                String clickedValue =(String) parent.getItemAtPosition(position);
+
+                intent.putExtra(INTENT_DATETIMEKEY, clickedValue);
+                startActivity(intent);
+
+
+
 
             }
         });
