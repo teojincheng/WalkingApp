@@ -135,6 +135,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
                 formattedDate = df.format(c.getTime());
 
+                getPermissionAndLocationChange(list);
+
             }
         });
 
@@ -274,47 +276,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mLocationPermissionGranted) {
             mLastKnownLocation = LocationServices.FusedLocationApi
                     .getLastLocation(mGoogleApiClient);
-
-
-            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            //minimum time interval between location updates, in milliseconds. in here, is every 10 seconds.
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, new LocationListener() {
-                @Override
-                /**
-                 * Every time the current location of the device change,
-                 * add the latlng of the current location into an arrayList
-                 *
-                 * Display the 'locations' /coordinate the user has walked.
-                 */
-                public void onLocationChanged(Location location) {
-                    list.add(new LatLng(location.getLatitude(), location.getLongitude()));
-
-                    Polyline line = mMap.addPolyline(new PolylineOptions()
-                            .addAll(list)
-                            .width(5)
-                            .color(Color.RED));
-
-
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status,
-                                            Bundle extras) {
-
-                }
-            });
-
-
         }
 
         // Set the map's camera position to the current location of the device.
@@ -394,6 +355,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         return totalDistance;
+
+    }
+
+
+    /**
+     * Check permission then start listening for location changes.
+     * When location change, add the latlng in an arraylist.
+     * @param tList an arraylist which is used to hold all the latlng of the entire walk
+     */
+    public void getPermissionAndLocationChange(final ArrayList<LatLng> tList){
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+
+        if (mLocationPermissionGranted) {
+            LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            //minimum time interval between location updates, in milliseconds. in here, is every 10 seconds.
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, new LocationListener() {
+                @Override
+                /**
+                 * Every time the current location of the device change,
+                 * add the latlng of the current location into an arrayList
+                 *
+                 * Display the 'locations' /coordinate the user has walked.
+                 */
+                public void onLocationChanged(Location location) {
+                    tList.add(new LatLng(location.getLatitude(), location.getLongitude()));
+
+                    Polyline line = mMap.addPolyline(new PolylineOptions()
+                            .addAll(tList)
+                            .width(5)
+                            .color(Color.RED));
+
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status,
+                                            Bundle extras) {
+
+                }
+            });
+        }
 
     }
 
