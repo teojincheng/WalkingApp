@@ -96,6 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //create the view elements
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.button2);
+        button.setText("go to list");
         startButton = (Button) findViewById(R.id.buttonStart);
         endButton = (Button) findViewById(R.id.buttonEnd);
 
@@ -158,6 +159,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             }
+        });
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intentToList = new Intent(getApplicationContext(),ListOfWalks.class);
+                startActivity(intentToList);
+
+            }
+
         });
 
         /**
@@ -224,13 +235,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getDeviceLocation();
 
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
 
-
-            }
-
-        });
 
     }
 
