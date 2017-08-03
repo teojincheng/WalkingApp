@@ -16,13 +16,13 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TextView" />
+        android:text="@string/pressStart" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Button" />
+        android:text="@string/goToList" />
 
     <Button
         android:id="@+id/buttonStart"
@@ -36,10 +36,6 @@
         android:layout_height="wrap_content"
         android:text="@string/stop" />
 
-    <TextView
-        android:id="@+id/textViewStep"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+
 
 </LinearLayout>

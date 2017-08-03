@@ -6,4 +6,9 @@
     <string name="currentWalk">Current Walk</string>
     <string name="listOfWalks">List of Walks</string>
     <string name="detailsOfWalk">Details of Walk</string>
+    <string name="runCompleted">Walk Completed</string>
+    <string name="back">Back</string>
+    <string name="goToList">Go To List</string>
+    <string name="pressStart">Press start to begin recording</string>
+
 </resources>

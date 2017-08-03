@@ -26,12 +26,15 @@
             android:id="@+id/imageViewWatch"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:src="@drawable/stopwatch" />
+            android:src="@drawable/stopwatch"
+            android:layout_weight="0.5"
+            />
 
         <TextView
             android:id="@+id/textViewDuration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
              />
 
     </LinearLayout>
@@ -46,12 +49,15 @@
             android:id="@+id/imageViewShoe"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:src="@drawable/shoe" />
+            android:src="@drawable/shoe"
+            android:layout_weight="0.5"
+            />
 
         <TextView
             android:id="@+id/textViewDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             />
 
     </LinearLayout>

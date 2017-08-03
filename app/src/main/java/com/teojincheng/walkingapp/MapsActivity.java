@@ -58,6 +58,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.OnConnectionFailedListener {
 
     private String TAG = "walkingApp";
+    private String INTENT_DISTANCEKEY ="distance";
+    private  String INTENT_TIMEKEY = "time";
 
     // variable for Google Map API
     private GoogleMap mMap;
@@ -96,7 +98,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //create the view elements
         textView = (TextView) findViewById(R.id.textView);
         button = (Button) findViewById(R.id.button2);
-        button.setText("go to list");
         startButton = (Button) findViewById(R.id.buttonStart);
         endButton = (Button) findViewById(R.id.buttonEnd);
 
@@ -144,7 +145,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         endButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 double computedDistance = getDistance();
-                textView.setText(String.valueOf(computedDistance));
                 long elapsedTime = stopWatchService.getElapsedTime();
 
                 //on the new child node, create these 4 'fields' and insert into the database
@@ -156,6 +156,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 stopService(stopWatchIntent);
                 unbindService(mConnection);
                 mBound = false;
+
+                Intent intentToFinish = new Intent(getApplicationContext(),FinishActivity.class);
+                intentToFinish.putExtra(INTENT_DISTANCEKEY,computedDistance);
+                intentToFinish.putExtra(INTENT_TIMEKEY,elapsedTime);
+                startActivity(intentToFinish);
 
 
             }
